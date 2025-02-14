@@ -6,13 +6,21 @@ let intervencoes_map = new Map();
 function initialize_viaturas() {
     return axios.get('http://localhost:3000/reparacoes')
         .then(response => {
+            viaturas_map.clear();
+
             response.data.forEach(reparacao => {
-                const { marca, modelo } = reparacao.viatura;
+                const { marca,modelo } = reparacao.viatura;
 
                 if (!viaturas_map.has(marca)) {
-                    viaturas_map.set(marca, new Set());
+                    viaturas_map.set(marca, {
+                        models:new Set(),
+                        count:0
+                    });
                 }
-                viaturas_map.get(marca).add(modelo);
+
+                const marca_info = viaturas_map.get(marca);
+                marca_info.models.add(modelo);
+                marca_info.count++;
             });
 
             console.log('Viaturas inicializadas.');
@@ -25,6 +33,8 @@ function initialize_viaturas() {
 function initialize_intervencoes() {
     return axios.get('http://localhost:3000/reparacoes')
         .then(response => {
+            intervencoes_map.clear();
+
             response.data.forEach(reparacao => {
                 reparacao.intervencoes.forEach(interv => {
                     if (!intervencoes_map.has(interv.codigo)) {
@@ -36,7 +46,7 @@ function initialize_intervencoes() {
                     }
 
                     intervencoes_map.get(interv.codigo).reparacoes.push({
-                        nome:reparacao.nome,
+                        nome: reparacao.nome,
                         matricula: reparacao.viatura.matricula,
                     });
                 });
@@ -53,7 +63,7 @@ exports.get_viaturas = () => viaturas_map;
 exports.get_intervencoes = () => intervencoes_map;
 
 exports.initialize_data = () => {
-    initialize_viaturas()
+    return initialize_viaturas()
         .then(() => initialize_intervencoes())
         .then(() => {
             console.log('Viaturas e intervenções inicializadas.');
