@@ -4,35 +4,20 @@ const data = require('./data');
 
 data.initialize_data();
 
-function generateHTMLHead(title) {
+function generate_HTML(title,content) {
     return `
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="pt">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
         <title>${title}</title>
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     </head>
     <body>
-    `;
-}
-
-function generateHTMLFooter() {
-    return `
+        ${content}
     </body>
     </html>
-    `;
-}
-
-function generateNavBar() {
-    return `
-    <div class="w3-container w3-teal">
-        <h1><strong>Oficina</strong></h1>
-    </div>
-    <div class="w3-container">
-        <p><a href="/reparacoes" class="w3-button w3-teal">reparações</a></p>
-        <p><a href="/viaturas" class="w3-button w3-teal">viaturas</a></p>
-        <p><a href="/intervencoes" class="w3-button w3-teal">intervenções</a></p>
-    </div>
     `;
 }
 
@@ -43,18 +28,24 @@ http.createServer((req, res) => {
     switch (req.method) {
         case 'GET':
             if (req.url === '/') {
-                res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'});
-                res.write(generateHTMLHead('OFICINA'));
-                res.write(generateNavBar());
-                res.write(generateHTMLFooter());
+                const main_page = `
+                    <div class="w3-container w3-teal">
+                        <h1><strong>Oficina</strong></h1>
+                    </div>
+                    <div class="w3-container">
+                        <p><a href="/reparacoes" class="w3-button w3-teal">reparações</a></p>
+                        <p><a href="/viaturas" class="w3-button w3-teal">viaturas</a></p>
+                        <p><a href="/intervencoes" class="w3-button w3-teal">intervenções</a></p>
+                    </div>
+                    `;
+                res.writeHead(200, {'Content-Type':'text/html;charset=utf-8'});
+                res.write(generate_HTML('oficina', main_page));
                 res.end();
             } else if (req.url === '/reparacoes') {
                 axios.get('http://localhost:3000/reparacoes?_sort=nome')
                     .then(resp => {
                         var reparacoes = resp.data;
-                        res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'});
-                        res.write(generateHTMLHead('Reparações'));
-                        res.write(`
+                        const content = `
                             <div class="w3-container w3-teal">
                                 <h1><strong>Reparações</strong></h1>
                             </div>
@@ -69,38 +60,33 @@ http.createServer((req, res) => {
                                         <th>Modelo</th>
                                         <th># Intervenções</th>
                                     </tr>
-                        `);
+                                    ${reparacoes.map(element => `
+                                        <tr>
+                                            <td><a href="/reparacoes/${element.nif}"><strong>${element.nif}</strong></a></td>
+                                            <td>${element.nome}</td>
+                                            <td>${element.data}</td>
+                                            <td>${element.viatura.marca}</td>
+                                            <td>${element.viatura.modelo}</td>
+                                            <td>${element.nr_intervencoes}</td>
+                                        </tr>
+                                    `).join('')}
+                                </table>
+                            </div>`;
 
-                        reparacoes.forEach(element => {
-                            res.write(`
-                                <tr>
-                                    <td><a href="/reparacoes/${element.nif}"><strong>${element.nif}</strong></a></td>
-                                    <td>${element.nome}</td>
-                                    <td>${element.data}</td>
-                                    <td>${element.viatura.marca}</td>
-                                    <td>${element.viatura.modelo}</td>
-                                    <td>${element.nr_intervencoes}</td>
-                                </tr>
-                            `);
-                        });
-
-                        res.write('</table></div>');
-                        res.write(generateHTMLFooter());
+                        res.writeHead(200, {'Content-Type':'text/html;charset=utf-8'});
+                        res.write(generate_HTML('reparações', content));
                         res.end();
                     })
                     .catch(err => {
                         console.error(err);
-                        res.writeHead(500, {'Content-Type': 'text/html;charset=utf-8'});
+                        res.writeHead(500, {'Content-Type':'text/html;charset=utf-8'});
                         res.end();
                     });
             } else if (req.url.match(/^\/reparacoes\/(\d+)$/)) {
                 axios.get(`http://localhost:3000/reparacoes?nif=${req.url.match(/^\/reparacoes\/(\d+)$/)[1]}`)
                     .then(resp => {
                         const reparacao = resp.data[0];
-
-                        res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'});
-                        res.write(generateHTMLHead('Detalhes da Reparação'));
-                        res.write(`
+                        const content = `
                             <div class="w3-container w3-teal">
                                 <h1>detalhes da reparação - ${reparacao.nif}</h1>
                             </div>
@@ -118,76 +104,61 @@ http.createServer((req, res) => {
                                         <th>Nome</th>
                                         <th>Descrição</th>
                                     </tr>
-                        `);
+                                    ${reparacao.intervencoes.map(interv => `
+                                        <tr>
+                                            <td>${interv.codigo}</td>
+                                            <td>${interv.nome}</td>
+                                            <td>${interv.descricao}</td>
+                                        </tr>
+                                    `).join('')}
+                                </table>
+                            </div>`;
 
-                        reparacao.intervencoes.forEach(interv => {
-                            res.write(`
-                                <tr>
-                                    <td>${interv.codigo}</td>
-                                    <td>${interv.nome}</td>
-                                    <td>${interv.descricao}</td>
-                                </tr>
-                            `);
-                        });
-
-                        res.write('</table>');
-                        res.write('</div>');
-                        res.write(generateHTMLFooter());
+                        res.writeHead(200, {'Content-Type':'text/html;charset=utf-8'});
+                        res.write(generate_HTML('detalhes', content));
                         res.end();
                     })
                     .catch(err => {
                         console.error(err);
-                        res.writeHead(500, {'Content-Type': 'text/html;charset=utf-8'});
+                        res.writeHead(500, {'Content-Type':'text/html;charset=utf-8'});
                         res.end();
                     });
             } else if (req.url === '/viaturas') {
                 try {
-                    const marcas_sorted = Array.from(data.get_viaturas().entries()).sort();
+                    const viaturas = data.get_viaturas();
+                    const sortedEntries = Array.from(viaturas.entries()).sort();
 
-                    res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'});
-                    res.write(generateHTMLHead('Marcas/Modelos'));
-                    res.write(`
+                    const content = `
                         <div class="w3-container w3-teal">
                             <h1><strong>Viaturas</strong></h1>
                         </div>
                         <div class="w3-container">
                             <p><a href="/" class="w3-button w3-teal">voltar</a></p>
-                    `);
+                            ${sortedEntries.map(([marca, info]) => `
+                                <h4><strong>${marca}</strong> (${info.count} veículos)</span></h4>
+                                <table class="w3-table w3-bordered w3-striped">
+                                    <tr><th>Modelo</th></tr>
+                                    ${Array.from(info.models).sort().map(modelo => `
+                                        <tr>
+                                            <td>${modelo}</td>
+                                        </tr>
+                                    `).join('')}
+                                </table>
+                            `).join('')}
+                        </div>`;
 
-                    marcas_sorted.forEach(([marca, modelos]) => {
-                        res.write(`
-                            <h2>${marca}</h2>
-                            <table class="w3-table w3-bordered w3-striped">
-                                <tr><th>Modelo</th></tr>
-                        `);
-
-                        const modelos_sorted = Array.from(modelos).sort();
-                        modelos_sorted.forEach(modelo => {
-                            res.write(`
-                                <tr>
-                                    <td>${modelo}</td>
-                                </tr>
-                            `);
-                        });
-
-                        res.write('</table>');
-                    });
-
-                    res.write('</div>');
-                    res.write(generateHTMLFooter());
+                    res.writeHead(200, {'Content-Type':'text/html;charset=utf-8'});
+                    res.write(generate_HTML('Viaturas', content));
                     res.end();
                 } catch (err) {
                     console.error(err);
-                    res.writeHead(500, {'Content-Type': 'text/html;charset=utf-8'});
+                    res.writeHead(500, {'Content-Type':'text/html;charset=utf-8'});
                     res.end();
                 }
             } else if (req.url === '/intervencoes') {
                 try {
                     const intervencoes_sorted = Array.from(data.get_intervencoes().entries()).sort();
-
-                    res.writeHead(200, { 'Content-Type': 'text/html;charset=utf-8' });
-                    res.write(generateHTMLHead('Intervenções'));
-                    res.write(`
+                    const content = `
                         <div class="w3-container w3-teal">
                             <h1><strong>Intervenções</strong></h1>
                         </div>
@@ -199,34 +170,28 @@ http.createServer((req, res) => {
                                     <th>Nome</th>
                                     <th>Descrição</th>
                                 </tr>
-                    `);
+                                ${intervencoes_sorted.map(([codigo,{ nome,descricao }]) => `
+                                    <tr>
+                                        <td><a href="/intervencoes/${codigo}"><strong>${codigo}</strong></a></td>
+                                        <td>${nome}</td>
+                                        <td>${descricao}</td>
+                                    </tr>
+                                `).join('')}
+                            </table>
+                        </div>`;
 
-                    intervencoes_sorted.forEach(([codigo, { nome, descricao }]) => {
-                        res.write(`
-                            <tr>
-                                <td><a href="/intervencoes/${codigo}"><strong>${codigo}</strong></a></td>
-                                <td>${nome}</td>
-                                <td>${descricao}</td>
-                            </tr>
-                        `);
-                    });
-
-                    res.write('</table>');
-                    res.write('</div>');
-                    res.write(generateHTMLFooter());
+                    res.writeHead(200, {'Content-Type':'text/html;charset=utf-8'});
+                    res.write(generate_HTML('intervenções', content));
                     res.end();
                 } catch (err) {
                     console.error(err);
-                    res.writeHead(500, { 'Content-Type': 'text/html;charset=utf-8' });
+                    res.writeHead(500, {'Content-Type':'text/html;charset=utf-8'});
                     res.end();
                 }
             } else if (req.url.match(/^\/intervencoes\/(.+)$/)) {
                 const codigo = req.url.match(/^\/intervencoes\/(.+)$/)[1];
                 const interv = data.get_intervencoes().get(codigo);
-
-                res.writeHead(200, { 'Content-Type': 'text/html;charset=utf-8' });
-                res.write(generateHTMLHead(`Detalhes da Intervenção - ${interv.nome}`)); // Add head
-                res.write(`
+                const content = `
                     <div class="w3-container w3-teal">
                         <h1>detalhes da intervenção - ${codigo}</h1>
                     </div>
@@ -238,31 +203,27 @@ http.createServer((req, res) => {
                         <h2>Reparações</h2>
                         <table class="w3-table w3-bordered w3-striped">
                             <tr><th>Nome</th><th>Matrícula</th></tr>
-                `);
+                            ${interv.reparacoes.map(reparacao => `
+                                <tr>
+                                    <td>${reparacao.nome}</td>
+                                    <td>${reparacao.matricula}</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>`;
 
-                interv.reparacoes.forEach(reparacao => {
-                    res.write(`
-                            <tr>
-                                <td>${reparacao.nome}</td>
-                                <td>${reparacao.matricula}</td>
-                            </tr>
-                        `);
-                });
-
-                res.write('</table>');
-                res.write('</div>');
-                res.write(generateHTMLFooter());
+                res.writeHead(200, {'Content-Type':'text/html;charset=utf-8'});
+                res.write(generate_HTML(`detalhes da intervenção - ${interv.nome}`, content));
                 res.end();
-
             } else {
-                res.writeHead(404, { 'Content-Type': 'text/html;charset=utf-8' });
+                res.writeHead(404, {'Content-Type':'text/html;charset=utf-8'});
                 res.write('<h1>NOT FOUND</h1>');
                 res.end();
             }
             break;
 
         default:
-            res.writeHead(405, { 'Content-Type': 'text/html;charset=utf-8' });
+            res.writeHead(405, {'Content-Type':'text/html;charset=utf-8'});
             res.end();
             break;
     }
