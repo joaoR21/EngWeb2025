@@ -1,6 +1,6 @@
 # TPC3
 
-Pretende-se construir um serviço em *nodejs*, que consuma a API de dados servida pelo *json-server* dos alunos.
+Pretende-se construir um serviço em *nodejs*, que consuma a API de dados servida pelo *json-server* do registo de alunos.
 O serviço permite **consultar**, **adicionar**, **editar** e **remover** registos de alunos.
 
 ## Resultados
