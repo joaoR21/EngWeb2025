@@ -25,7 +25,7 @@ docker exec -it mongoEW mongoimport -d livros -c livros --file tmp/db.json --jso
 ```
 
 ## respostas textuais
-inserir link
+[queries](https://github.com/joaoR21/EngWeb2025/blob/main/ENGWEB2025-Afericao/ex1/queries.txt)
 
 ## instruções de como executar as aplicações desenvolvidas
 Num terminal, executar:
