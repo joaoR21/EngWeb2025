@@ -1,0 +1,28 @@
+1.
+db.livros.countDocuments({ title : /Love/i })
+
+2.
+db.livros.find(
+    { author: /Austen$/ },
+    { title : 1, _id : 0 }
+).sort({ title : 1 })
+
+3.
+db.livros.aggregate([
+    { $unwind: "$author" },
+    { $group: { _id : "$author" } },
+    { $sort: { _id : 1 } }
+])
+
+4.
+db.livros.aggregate([
+    { $unwind: "$genres" },
+    { $group: { _id : "$genres", count : { $sum : 1 } } },
+    { $sort: { count : -1 } }
+])
+
+5.
+db.livros.find(
+    { characters : "Sirius Black" },
+    { title : 1, isbn : 1, _id : 0 }
+).sort({ title : 1 })
