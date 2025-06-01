@@ -1,0 +1,61 @@
+extends layout
+
+block content
+  .w3-container.w3-padding-32
+    if error
+      .w3-panel.w3-red
+        h3 ERROR
+        p= error
+    else if resource
+      .w3-card-4
+        header.w3-container.w3-blue-grey
+          h2= resource.title
+          if resource.userId && resource.userId.username
+            p.w3-small Submitted by:
+              a(href=`/profile/${resource.userId._id}`)= resource.userId.username
+        .w3-container.w3-padding
+          p
+            strong Resource Type:
+            | #{resource.resourceType}
+          p
+            strong Creation Date:
+            | #{resource.creationDate ? new Date(resource.creationDate).toLocaleDateString() : 'N/A'}
+          p
+            strong Submission Date:
+            | #{new Date(resource.submissionDate).toLocaleDateString()}
+          if resource.producer
+            p
+              strong Producer:
+              | #{resource.producer}
+          if resource.description
+            h4 Description:
+            p.w3-padding.w3-border.w3-pale-yellow= resource.description
+          if resource.tags && resource.tags.length > 0
+            h5 Tags:
+            p
+              each tag in resource.tags
+                span.w3-tag.w3-round.w3-blue-grey.w3-margin-right.w3-margin-bottom= tag
+          p
+            strong Visibility:
+            | #{resource.isPublic ? 'Public' : 'Private'}
+          if !resource.isPublic && currentUser && resource.userId && currentUser.id === resource.userId._id
+            span.w3-tag.w3-tiny.w3-orange.w3-margin-left (Private - yours)
+          else if !resource.isPublic
+            span.w3-tag.w3-tiny.w3-red.w3-margin-left (Private)
+          if resource.associatedFiles && resource.associatedFiles.length > 0
+            h5 Associated File(s):
+            ul.w3-ul.w3-hoverable
+              each file in resource.associatedFiles
+                li
+                  a(href=`${backendBaseUrl}/data/resources/${resource._id}/files/${file.storageName}` target="_blank" rel="noopener noreferrer")= file.originalName
+                  span.w3-small (#{file.mimetype}, #{Math.round(file.size / 1024)} KB)
+          else
+            p No file(s) associated with this resource.
+        footer.w3-container.w3-padding.w3-light-grey
+          a.w3-button.w3-sand(href="/") back to timeline
+          if currentUser && resource.userId && currentUser.id === resource.userId._id
+            a.w3-button.w3-khaki.w3-margin-left(href=`/edit/${resource._id}`) Edit
+            form(action=`/delete/${resource._id}`, method="POST", style="display:inline-block; margin-left:8px;")
+              button.w3-button.w3-red(type="submit" onclick="return confirm('Are you sure you want to delete this item?');") Delete
+    else
+      p.w3-center Resource not found or you do not have permission to view it.

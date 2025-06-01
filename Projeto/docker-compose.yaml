@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  data:
+    build: ./data
+    container_name: me-backend
+    ports:
+      - "16000:16000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/TP-EW2025
+      - PORT=16000
+    volumes:
+      - ./data/filestore:/usr/src/app/data/filestore
+      - ./data:/usr/src/app/data
+      - /usr/src/app/data/node_modules
+    depends_on:
+      - mongo
+    networks:
+      - network
+
+  frontend:
+    build: ./frontend
+    container_name: me-frontend
+    ports:
+      - "17000:17000"
+    environment:
+      - BACKEND_API_URL=http://data:16000
+      - PORT=17000
+    volumes:
+      - ./frontend:/usr/src/app/frontend
+      - /usr/src/app/frontend/node_modules
+    depends_on:
+      - data
+    networks:
+      - network
+
+  mongo:
+    image: mongo:latest
+    container_name: me-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - network
+
+volumes:
+  mongo_data:
+
+networks:
+  network:
+    driver: bridge

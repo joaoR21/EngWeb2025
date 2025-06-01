@@ -1,0 +1,33 @@
+extends layout
+
+block content
+  .w3-container.w3-padding-large
+    if error
+      .w3-panel.w3-red.w3-round-large.w3-margin-bottom
+        p= error
+
+    if message
+      .w3-panel(class=(messageType === 'error' ? 'w3-red' : (messageType === 'success' ? 'w3-green' : 'w3-blue'))).w3-round-large.w3-margin-bottom
+        p= message
+
+    h2.w3-xlarge.w3-left-align.w3-padding-bottom.w3-margin-bottom(style="font-weight:700;")= userToEdit && userToEdit._id ? 'Edit User' : 'Create User'
+
+    form.w3-card.w3-white.w3-round-large.w3-padding-large.w3-margin-bottom(action=action method="POST" style="max-width:500px;")
+      .w3-section.w3-margin-bottom
+        label.w3-text-grey(for="username" style="font-weight:600; margin-bottom:6px; display:block;") Username:
+        input.w3-input.w3-border.w3-round-xlarge#username(type="text" name="username" value=userToEdit.username required)
+
+      if !(userToEdit && userToEdit._id)
+        .w3-section.w3-margin-bottom
+          label.w3-text-grey(for="password" style="font-weight:600; margin-bottom:6px; display:block;") Password:
+          input.w3-input.w3-border.w3-round-xlarge#password(type="password" name="password" required=(!userToEdit._id))
+
+      .w3-section.w3-margin-bottom
+        label.w3-text-grey(for="level" style="font-weight:600; margin-bottom:6px; display:block;") Level:
+        select.w3-select.w3-border.w3-round-xlarge#level(name="level" required)
+          each lvl in levels
+            option(value=lvl selected=(userToEdit.level === lvl || (!userToEdit.level && lvl === 'consumer'))) #{lvl.charAt(0).toUpperCase() + lvl.slice(1)}
+
+      .w3-section.w3-margin-bottom
+        button.w3-button.w3-blue.w3-hover-indigo.w3-padding-large.w3-round-xxlarge(type="submit" style="font-weight:600; letter-spacing:0.5px; width:100%; max-width:unset;")
+          | #{userToEdit && userToEdit._id ? 'Save' : 'Create'}

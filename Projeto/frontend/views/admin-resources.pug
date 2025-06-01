@@ -1,0 +1,43 @@
+extends layout
+
+block content
+  .w3-container.w3-padding-large
+    if message
+      .w3-panel(class=(messageType === 'error' ? 'w3-red' : (messageType === 'success' ? 'w3-green' : 'w3-blue'))).w3-round-large.w3-margin-bottom
+        p= message
+
+    h2.w3-xlarge.w3-left-align.w3-padding-bottom.w3-margin-bottom(style="font-weight:700;") Resources
+
+    if error
+      p.w3-text-red= error
+    else if resources && resources.length
+      table.w3-table-all.w3-hoverable.w3-card.w3-round-large(style="border:1px solid #ececec;")
+        thead
+          tr.w3-light-grey
+            th Title
+            th Type
+            th Owner
+            th Submission Date
+            th Public
+            th Actions
+        tbody
+          each resource in resources
+            tr
+              td= resource.title
+              td= resource.resourceType
+              td= resource.ownerID ? resource.ownerID.username : 'N/A'
+              td= resource.submissionDate ? new Date(resource.submissionDate).toLocaleDateString() : 'N/A'
+              td #{resource.isPublic ? 'Yes' : 'No'}
+              td
+                a.w3-button.w3-small.w3-blue.w3-round-xxlarge(href=`/edit/${resource._id}`)
+                  i.fa.fa-pencil.w3-margin-right
+                  | Edit
+                form(action=`/delete/${resource._id}`, method="POST", style="display:inline;")
+                  button.w3-button.w3-small.w3-red.w3-round-xxlarge(type="submit", onclick="return confirm('Are you sure you want to delete this resource? This action cannot be undone.');")
+                    i.fa.fa-trash.w3-margin-right
+                    | Delete
+                a.w3-button.w3-small.w3-teal.w3-round-xxlarge(href=`/download/resource/${resource._id}/dip` target="_blank")
+                  i.fa.fa-download.w3-margin-right
+                  | Export
+    else
+      p No resources found.

@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  .w3-container.w3-padding-large
+    if message
+      .w3-panel(class=(messageType === 'error' ? 'w3-red' : (messageType === 'success' ? 'w3-green' : 'w3-blue'))).w3-round-large.w3-margin-bottom
+        p= message
+
+    .w3-row-padding.w3-margin-bottom
+      .w3-col.l3.m6.s12
+        .w3-card.w3-round-large.w3-white.w3-padding-large(style="border:1px solid #ececec; min-height:130px;")
+          h4.w3-text-grey.w3-margin-bottom(style="font-weight:600; letter-spacing:0.5px;") Users
+          a.w3-button.w3-blue.w3-round-xxlarge.w3-margin-top(href="/admin/users") Go to Users
+
+      .w3-col.l3.m6.s12
+        .w3-card.w3-round-large.w3-white.w3-padding-large(style="border:1px solid #ececec; min-height:130px;")
+          h4.w3-text-grey.w3-margin-bottom(style="font-weight:600; letter-spacing:0.5px;") News
+          a.w3-button.w3-teal.w3-round-xxlarge.w3-margin-top(href="/admin/news") Go to News
+
+      .w3-col.l3.m6.s12
+        .w3-card.w3-round-large.w3-white.w3-padding-large(style="border:1px solid #ececec; min-height:130px;")
+          h4.w3-text-grey.w3-margin-bottom(style="font-weight:600; letter-spacing:0.5px;") Resources
+          a.w3-button.w3-green.w3-round-xxlarge.w3-margin-top(href="/admin/resources") Go to Resources
+
+      .w3-col.l3.m6.s12
+        .w3-card.w3-round-large.w3-white.w3-padding-large(style="border:1px solid #ececec; min-height:130px;")
+          h4.w3-text-grey.w3-margin-bottom(style="font-weight:600; letter-spacing:0.5px;") Statistics
+          a.w3-button.w3-orange.w3-round-xxlarge.w3-margin-top(href="/admin/statistics") View Statitics

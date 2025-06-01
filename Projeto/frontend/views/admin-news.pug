@@ -1,0 +1,46 @@
+extends layout
+
+block content
+  .w3-container.w3-padding-large
+    if message
+      .w3-panel(class=(messageType === 'error' ? 'w3-red' : (messageType === 'success' ? 'w3-green' : 'w3-blue'))).w3-round-large.w3-margin-bottom
+        p= message
+
+    h2.w3-xlarge.w3-left-align.w3-padding-bottom.w3-margin-bottom(style="font-weight:700;") News
+
+    a.w3-button.w3-blue.w3-round-xxlarge.w3-margin-bottom(href="/admin/news/new")
+      i.fa.fa-plus.w3-margin-right
+      | Create
+
+    if error
+      p.w3-text-red= error
+    else if newsItems && newsItems.length
+      table.w3-table-all.w3-hoverable.w3-card.w3-round-large(style="border:1px solid #ececec;")
+        thead
+          tr.w3-light-grey
+            th Title
+            th Author
+            th Publication Date
+            th Visible
+            th Actions
+        tbody
+          each item in newsItems
+            tr
+              td= item.title
+              td= item.author ? item.author.username : 'N/A'
+              td= item.publicationDate ? new Date(item.publicationDate).toLocaleString() : 'N/A'
+              td #{item.isVisible ? 'Yes' : 'No'}
+              td
+                a.w3-button.w3-small.w3-blue.w3-round-xxlarge(href=`/admin/news/edit/${item._id}`)
+                  i.fa.fa-pencil.w3-margin-right
+                  | Edit
+                form(action=`/admin/news/delete/${item._id}`, method="POST", style="display:inline;")
+                  button.w3-button.w3-small.w3-red.w3-round-xxlarge(type="submit", onclick="return confirm('Are you sure you want to delete this news item?');")
+                    i.fa.fa-trash.w3-margin-right
+                    | Delete
+                form(action=`/admin/news/toggle/${item._id}`, method="POST", style="display:inline;")
+                  button.w3-button.w3-small.w3-orange.w3-round-xxlarge(type="submit")
+                    i.fa.fa-eye-slash.w3-margin-right
+                    | #{item.isVisible ? 'Hide' : 'Show'}
+    else
+      p No news items found.

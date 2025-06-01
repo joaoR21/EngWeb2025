@@ -1,0 +1,5 @@
+This is the content of the example text file.
+It's part of the Submission Information Package (SIP)
+for testing the digital-me API.
+
+Date: 2025-04-30

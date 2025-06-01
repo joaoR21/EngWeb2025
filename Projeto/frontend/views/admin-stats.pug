@@ -1,0 +1,63 @@
+extends layout
+
+block content
+  .w3-container.w3-padding-large
+    h2.w3-xlarge.w3-left-align.w3-padding-bottom.w3-margin-bottom(style="font-weight:700;") Statistics
+
+    if error
+      .w3-panel.w3-red.w3-round-large.w3-margin-bottom
+        p= error
+    else if stats
+      .w3-row-padding
+
+        .w3-third
+          .w3-card.w3-round-large.w3-white.w3-padding-large(style="border:1px solid #ececec; min-height:220px;")
+            h4.w3-text-grey.w3-margin-bottom(style="font-weight:600; letter-spacing:0.5px;")
+              i.fa.fa-users.w3-text-blue.w3-margin-right
+              | Users
+            p.w3-xxlarge.w3-text-blue.w3-margin-bottom(style="font-weight:700;") #{stats.users.total}
+            if stats.users.byLevel && stats.users.byLevel.length
+              h5.w3-text-grey.w3-margin-top.w3-margin-bottom-small(style="font-weight:500;") By Level
+              ul.w3-ul.w3-small
+                each levelStat in stats.users.byLevel
+                  li
+                    span.w3-badge.w3-light-grey.w3-margin-right #{levelStat._id}
+                    | #{levelStat.count}
+
+        .w3-third
+          .w3-card.w3-round-large.w3-white.w3-padding-large(style="border:1px solid #ececec; min-height:220px;")
+            h4.w3-text-grey.w3-margin-bottom(style="font-weight:600; letter-spacing:0.5px;")
+              i.fa.fa-database.w3-text-green.w3-margin-right
+              | Resources
+            p.w3-xxlarge.w3-text-green.w3-margin-bottom(style="font-weight:700;") #{stats.resources.total}
+            .w3-row.w3-margin-bottom
+              .w3-half
+                span.w3-tag.w3-green.w3-round.w3-margin-right Public
+                | #{stats.resources.public}
+              .w3-half
+                span.w3-tag.w3-grey.w3-round.w3-margin-right Private
+                | #{stats.resources.private}
+            if stats.resources.byType && stats.resources.byType.length
+              h5.w3-text-grey.w3-margin-top.w3-margin-bottom-small(style="font-weight:500;") By Type
+              ul.w3-ul.w3-small
+                each typeStat in stats.resources.byType
+                  li
+                    span.w3-badge.w3-light-grey.w3-margin-right #{typeStat._id}
+                    | #{typeStat.count}
+
+        .w3-third
+          .w3-card.w3-round-large.w3-white.w3-padding-large(style="border:1px solid #ececec; min-height:220px;")
+            h4.w3-text-grey.w3-margin-bottom(style="font-weight:600; letter-spacing:0.5px;")
+              i.fa.fa-newspaper-o.w3-text-teal.w3-margin-right
+              | News
+            p.w3-xxlarge.w3-text-teal.w3-margin-bottom(style="font-weight:700;") #{stats.news.total}
+            .w3-row.w3-margin-bottom
+              .w3-half
+                span.w3-tag.w3-teal.w3-round.w3-margin-right Visible
+                | #{stats.news.visible}
+              .w3-half
+                span.w3-tag.w3-grey.w3-round.w3-margin-right Hidden
+                | #{stats.news.total - stats.news.visible}
+
+    else
+      p.w3-text-grey No statistics available or failed to load.

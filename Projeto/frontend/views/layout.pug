@@ -1,0 +1,55 @@
+doctype html
+html(lang="en")
+  head
+    title= title ? title + ' - DigitalMe' : 'DigitalMe'
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css")
+    link(rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato")
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css")
+  body.w3-light-grey
+    .w3-top
+      .w3-bar.w3-blue.w3-card-4
+        .w3-content(style="max-width:1200px")
+          a.w3-bar-item.w3-button.w3-hover-indigo.w3-padding-large.w3-text-white(href="/")
+            i.fa.fa-home.w3-margin-right
+            span.w3-hide-small DigitalMe
+          if isAuthenticated
+            a.w3-bar-item.w3-button.w3-hover-light-blue.w3-padding-large.w3-text-white(href="/profile")
+              i.fa.fa-user-circle.w3-margin-right
+              | My Profile
+            if currentUser && (currentUser.level === 'producer' || currentUser.level === 'admin')
+              a.w3-bar-item.w3-button.w3-hover-green.w3-padding-large.w3-text-white(href="/new")
+                i.fa.fa-plus.w3-margin-right
+                | New Item
+            .w3-dropdown-hover
+              button.w3-button.w3-padding-large.w3-text-white.w3-hover-cyan(title="My Journeys")
+                | My Journeys
+                i.fa.fa-caret-down
+              .w3-dropdown-content.w3-bar-block.w3-card-4.w3-round(style="min-width:200px;")
+                a.w3-bar-item.w3-button.w3-hover-light-blue(href="/profile/academic")
+                  i.fa.fa-graduation-cap.w3-margin-right
+                  | Academic Journey
+                a.w3-bar-item.w3-button.w3-hover-teal(href="/profile/sports")
+                  i.fa.fa-futbol-o.w3-margin-right
+                  | Sports Journey
+            if currentUser && currentUser.level === 'admin'
+              a.w3-bar-item.w3-button.w3-hover-deep-orange.w3-padding-large.w3-text-white(href="/admin")
+                i.fa.fa-cogs.w3-margin-right
+                | Admin Panel
+            a.w3-bar-item.w3-button.w3-right.w3-hover-red.w3-padding-large.w3-text-white(href="/logout")
+              i.fa.fa-sign-out.w3-margin-right
+              | Logout
+          else
+            a.w3-bar-item.w3-button.w3-hover-light-blue.w3-padding-large.w3-text-white(href="/login")
+              i.fa.fa-sign-in.w3-margin-right
+              | Login
+            a.w3-bar-item.w3-button.w3-hover-green.w3-padding-large.w3-text-white(href="/register")
+              i.fa.fa-user-plus.w3-margin-right
+              | Register
+    .w3-content(style="max-width:1200px; margin-top:80px;")
+      .w3-row-padding
+        .w3-col.s12.m10.l9.w3-margin-auto
+          block content
+    footer.w3-container.w3-padding-16.w3-center.w3-opacity.w3-light-grey.w3-small.w3-margin-top
+      p DigitalMe app | EW2025
